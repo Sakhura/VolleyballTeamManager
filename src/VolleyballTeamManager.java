@@ -92,7 +92,25 @@ public class VolleyballTeamManager {
 
         try {
             players.clear();
-            File file = new File(filename);
+
+            // Intentar buscar en múltiples ubicaciones
+            File file = null;
+
+            // Primero intentar en la raíz del proyecto
+            file = new File(filename);
+            if (!file.exists()) {
+                // Si no existe, intentar en src/
+                file = new File("src/" + filename);
+            }
+            if (!file.exists()) {
+                // Si no existe, intentar ruta relativa desde out/
+                file = new File("../" + filename);
+            }
+
+            if (!file.exists()) {
+                throw new FileNotFoundException("No se encontró el archivo en las ubicaciones esperadas");
+            }
+
             Scanner fileScanner = new Scanner(file);
 
             while (fileScanner.hasNextLine()) {
@@ -109,6 +127,7 @@ public class VolleyballTeamManager {
 
         } catch (FileNotFoundException e) {
             System.out.println("Error: No se pudo encontrar el archivo '" + filename + "'");
+            System.out.println("Ubicaciones buscadas: ./, src/, ../");
             playersLoaded = false;
         } catch (Exception e) {
             System.out.println("Error al leer el archivo: " + e.getMessage());
@@ -249,7 +268,7 @@ public class VolleyballTeamManager {
     }
 
     /**
-     * Muestra los equipos formados
+     * Equipos formados
      */
     private void displayTeams(ArrayList<ArrayList<Player>> teams) {
         for (int i = 0; i < teams.size(); i++) {
@@ -269,7 +288,7 @@ public class VolleyballTeamManager {
     }
 
     /**
-     * Verifica si se han cargado jugadores
+     * Aca se verifica si se han cargado jugadores
      */
     private boolean checkPlayersLoaded() {
         if (!playersLoaded || players.isEmpty()) {
